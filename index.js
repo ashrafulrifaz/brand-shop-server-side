@@ -19,10 +19,18 @@ const client = new MongoClient(uri, {
   }
 });
 
+const categoryItems = [
+   {
+      "name": "sedan",
+      "image": ""
+   }
+]
+
 async function run() {
   try {
 
    const productCollection = client.db('productDB').collection('product')
+   const categoryCollection = client.db('productDB').collection('category')
 
    app.get('/products', async(req, res) => {
       const cursor = productCollection.find();
@@ -33,6 +41,18 @@ async function run() {
    app.post('/products', async(req, res) => {
       const query = req.body;
       const result = await productCollection.insertOne(query)
+      res.send(result)
+   })
+
+   app.get('/category', async(req, res) => {
+      const cursor = categoryCollection.find();
+      const result = await cursor.toArray()
+      res.send(result)
+   })
+
+   app.post('/category', async(req, res) => {
+      const query = req.body;
+      const result = await categoryCollection.insertOne(query)
       res.send(result)
    })
 
