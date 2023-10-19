@@ -28,6 +28,7 @@ async function run() {
    const categoryCollection = client.db('productDB').collection('category')
    const reviewCollection = client.db('productDB').collection('review')
    const sliderCollection = client.db('productDB').collection('slider')
+   const cartCollection = client.db('productDB').collection('cart')
 
    app.get('/products', async(req, res) => {
       const cursor = productCollection.find();
@@ -37,9 +38,28 @@ async function run() {
 
    app.get('/products/:id', async(req, res) => {
       const id = req.params.id
-      console.log(id);
       const filter = {_id: new ObjectId(id)}
       const result = await productCollection.findOne(filter)
+      res.send(result)
+   })
+
+   app.put('/products/:id', async(req, res) => {
+      const id = req.params.id
+      const updateProduct = req.body;
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert: true}
+      const product = {
+         $set: {
+            name: updateProduct.name,
+            brandName: updateProduct.brandName,
+            type: updateProduct.type,
+            image: updateProduct.image,
+            price: updateProduct.price,
+            rating: updateProduct.rating,
+            details: updateProduct.details
+         }
+      }
+      const result = await productCollection.updateOne(filter, product, options)
       res.send(result)
    })
 
@@ -79,6 +99,7 @@ async function run() {
       const result = await reviewCollection.insertOne(query)
       res.send(result)
    })
+
    app.get('/slider', async(req, res) => {
       const cursor = sliderCollection.find();
       const result = await cursor.toArray()
@@ -88,6 +109,25 @@ async function run() {
    app.post('/slider', async(req, res) => {
       const query = req.body;
       const result = await sliderCollection.insertOne(query)
+      res.send(result)
+   })
+
+   app.get('/cart', async(req, res) => {
+      const cursor = cartCollection.find();
+      const result = await cursor.toArray()
+      res.send(result)
+   })
+
+   app.post('/cart', async(req, res) => {
+      const query = req.body;
+      const result = await cartCollection.insertOne(query)
+      res.send(result)
+   })
+
+   app.delete('/cart/:id', async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const result = await cartCollection.deleteOne(filter)
       res.send(result)
    })
 
